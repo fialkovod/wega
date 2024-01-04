@@ -94,6 +94,16 @@ function pedit($str,$ns,$defv,$defc)
 
 }
 
+function iedit($str,$ns,$defv,$defc,$wsdt,$wpdt)
+{
+   include "../config/".$ns.".conf.php";
+   $tb="config";
+   $strv=dbval($str,$ns); echo "<a href=setpoint.php?ns=".$ns."&parameter=".$str."&wsdt=".urlencode($wsdt)."&wpdt=".urlencode($wpdt)."> ".$str." </a> = ".$strv." ".dbcomment($str,$ns)."<br>";
+   if (dbval($str,$ns)=='') {setdbval($ns,$str,$defv,$defc);}
+   mysqli_close($link);
+
+}
+
 function dbpsel($ns,$p,$comment)
 {
 
@@ -133,7 +143,7 @@ function form($ns,$parm,$comment)
    echo $comment;
    echo "   </select>";
    echo "  <input type='submit' value='Задать'>";
-   echo " ".$comment. ", имя парамтера: <b>".$parm."</b> ";
+   echo " ".$comment. ", имя параметра: <b>".$parm."</b> ";
    echo "</p></form>";
 
    if ( $_GET[$parm] )
@@ -148,14 +158,14 @@ function form($ns,$parm,$comment)
    }
 }
 
-function gplotgen($xsize,$ysize,$gimg,$wsdt,$wpdt,$csv,$handler,$text,$gnups,$img,$name,$nplot1,$nplot2,$nplot3,$nplot4,$nplot5,$dimens)
+function gplotgen($xsize,$ysize,$gimg,$wsdt,$wpdt,$csv,$handler,$text,$gnups,$img,$name,$nplot1,$nplot2,$nplot3,$nplot4,$nplot5,$dimens,$mouse=false)
 {
 global $LimitUP;
 global $LimitDOWN; 
 
 $text='
-set terminal png size '.$xsize.','.$ysize.'
-set output "'.$gimg.'"
+set terminal '.($mouse?'canvas':'png').' size '.$xsize.','.$ysize.' '.($mouse?'mousing jsdir "pljs"':'').'
+'.($mouse?'':'set output "'.$gimg.'"').'
 set datafile separator ";"
 set xdata time
 set format x "%d.%m\n%H:%M"
@@ -189,8 +199,13 @@ if($LimitDOWN != ""){ $text=$text.',fmin(x) w l title ""'; }
 fwrite($handler, $text);
 fclose($handler);
 $err=shell_exec('cat '.$gnups.'|gnuplot');
-echo "<br>";
-echo '<img src="'.$img.'" alt="альтернативный текст">';
+if ($mouse) {
+   echo $err;
+} else {
+   echo "<br>";
+   echo '<img src="'.$img.'" alt="альтернативный текст">';
+}
+
 }
 
 function mixer_banks($pname)

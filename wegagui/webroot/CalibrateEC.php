@@ -35,41 +35,6 @@ if (dbval("A1",$ns) != "null" and dbval("A2",$ns) != "null") {
     $eb=(-log($ec1/$ec2))/(log($ex2/$ex1));
     $ea=pow($ex1,(-$eb))*$ec1;
 
-echo "<h2>Калибровка EC</h2>";
-echo "Дата и время последнего замера: ".sensval("dt",$ns);
-
-echo "<br><br>";
-
-pedit("EC_date1",$ns,"2022-05-20 11:00:00","Дата/время контрольной точки 1");
-$dateval=dbval("EC_date1",$ns);
-echo "EC в точке 1 = ".round(valdate($p_EC,$dateval,$ns) -> value, 3);
-echo "<br>";
-echo "R2 в точке 1 = ".round(valdate($P_R2,$dateval,$ns) -> value, 3);
-echo "<br>";
-echo "Температура в точке 1 = ".round(valdate($p_ECtemp,$dateval,$ns) -> value, 3);
-echo "<br>Прошло: ".showDate( strtotime($dateval) );
-echo "<br><br>";
-
-
-pedit("EC_date2",$ns,"2022-05-20 12:00:00","Дата/время контрольной точки 2");
-$dateval=dbval("EC_date2",$ns);
-echo "EC в точке 2 = ".round(valdate($p_EC,$dateval,$ns) -> value, 3);
-echo "<br>";
-echo "R2 в точке 2 = ".round(valdate($P_R2,$dateval,$ns) -> value, 3);
-echo "<br>";
-echo "Температура в точке 2 = ".round(valdate($p_ECtemp,$dateval,$ns) -> value, 3);
-echo "<br>Прошло: ".showDate( strtotime($dateval) );
-echo "<br><br>";
-
-pedit("EC_date3",$ns,"2022-05-20 13:00:00","Дата/время контрольной точки 3");
-$dateval=dbval("EC_date3",$ns);
-echo "EC в точке 3 = ".round(valdate($p_EC,$dateval,$ns) -> value, 3);
-echo "<br>";
-echo "R2 в точке 3 = ".round(valdate($P_R2,$dateval,$ns) -> value, 3);
-echo "<br>";
-echo "Температура в точке 3 = ".round(valdate($p_ECtemp,$dateval,$ns) -> value, 3);
-echo "<br>Прошло: ".round(showDate( strtotime($dateval) ), 3);
-echo "<br><br>";
 
 include "sqfunc.php";
 include "datetime.php";
@@ -105,12 +70,12 @@ if ($P_A1 != 'null' and $P_A2 != 'null') {
     order by dt";
     include "sqltocsv.php";
     
-    $name="АЦП электродов измерения электропроводности";
+    $name="Ap, An";
     $dimens="RAW";
     $nplot1="A1.RAW(-)";
 	$nplot2="A2.RAW(+)";
     
-    gplotgen($xsize,$ysize,$gimg,$wsdt,$wpdt,$csv,$handler,$text,$gnups,$img,$name,$nplot1,$nplot2,$nplot3,$nplot4,$nplot5,$dimens);
+    gplotgen($xsize,$ysize,$gimg,$wsdt,$wpdt,$csv,$handler,$text,$gnups,$img,$name,$nplot1,$nplot2,$nplot3,$nplot4,$nplot5,$dimens,$mouse=true);
 
     echo "<br>Текущие значения АЦП при положительной и отрицательной фазе:";
     echo "<br>";
@@ -120,6 +85,53 @@ if ($P_A1 != 'null' and $P_A2 != 'null') {
 
 }
     
+
+echo "Дата и время последнего замера: ".sensval("dt",$ns);
+
+echo "<br><br>";
+echo "<h2>Калибровка EC</h2>";
+echo "<br><br>";
+iedit("EC_date1",$ns,"2022-05-20 11:00:00","Дата/время контрольной точки 1",$wsdt,$wpdt);
+$dateval=dbval("EC_date1",$ns);
+echo "EC в точке 1 = ".round(valdate($p_EC,$dateval,$ns) -> value, 3);
+echo "<br>";
+echo "R2 в точке 1 = ".round(valdate($P_R2,$dateval,$ns) -> value, 3);
+echo "<br>";
+echo "Температура в точке 1 = ".round(valdate($p_ECtemp,$dateval,$ns) -> value, 3);
+echo "<br>Прошло: ".showDate( strtotime($dateval) );
+echo "<br><br>";
+
+
+iedit("EC_date2",$ns,"2022-05-20 12:00:00","Дата/время контрольной точки 2",$wsdt,$wpdt);
+$dateval=dbval("EC_date2",$ns);
+$ce2 = round(valdate($p_EC,$dateval,$ns) -> value, 3);
+$te2 = round(dbcomment("EC_date2",$ns),3);
+$p = round(($ce2-$te2)/$te2*100,2);
+echo "EC в точке 2 = ".$ce2." (".$p."%)";
+echo "<br>";
+
+// .round(($R2p-$R2n)/$R2n*100,2)."%"
+echo "R2 в точке 2 = ".round(valdate($P_R2,$dateval,$ns) -> value, 3);
+echo "<br>";
+echo "Температура в точке 2 = ".round(valdate($p_ECtemp,$dateval,$ns) -> value, 3);
+echo "<br>Прошло: ".showDate( strtotime($dateval) );
+echo "<br><br>";
+
+iedit("EC_date3",$ns,"2022-05-20 13:00:00","Дата/время контрольной точки 3",$wsdt,$wpdt);
+$dateval=dbval("EC_date3",$ns);
+echo "EC в точке 3 = ".round(valdate($p_EC,$dateval,$ns) -> value, 3);
+echo "<br>";
+echo "R2 в точке 3 = ".round(valdate($P_R2,$dateval,$ns) -> value, 3);
+echo "<br>";
+echo "Температура в точке 3 = ".round(valdate($p_ECtemp,$dateval,$ns) -> value, 3);
+echo "<br>Прошло: ".showDate( strtotime($dateval) );
+echo "<br><br>";
+
+$calclink="calcEC.php?ns=".urlencode($ns)."&wsdt=".urlencode($wsdt)."&wpdt=".urlencode($wpdt);
+echo "<p><a href=".$calclink.">Калибровка по КТ</a>";
+echo "<br><br>";
+
+
     echo "<br>";
     echo "<br><h3>Параметры цепи измерения</h3>";
 
@@ -375,4 +387,37 @@ echo "<h0>".$time."</h0>";
 
 
 ?>
+
+
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var oldmax = gnuplot.datafmt(gnuplot.zoom_axis_xmax);
+            var oldmin = gnuplot.datafmt(gnuplot.zoom_axis_xmin);
+            var target = document.querySelector("td .mousebox");
+            if (target) {
+                target.style.visibility = "hidden";
+                target.style.display = "none";
+            }    
+            if (gnuplot?.mouse_version) {
+                tar = document.querySelector("table+.mbleft");
+                if (tar) tar.style.marginLeft = 0;
+                if (document.getElementById("gnuplot_canvas")) {
+                    setInterval(function() {
+                        curmax = gnuplot.datafmt(gnuplot.zoom_axis_xmax);
+                        curmin = gnuplot.datafmt(gnuplot.zoom_axis_xmin);
+                        if (gnuplot.zoomed && ((curmax != oldmax) || (curmin != oldmin))) {
+                            oldmax = curmax; oldmin = curmin;
+                            newd = (new Date(curmin).toISOString()).substr(0,19).replace("T"," ");
+                            document.getElementsByName("wsdt")[0].setAttribute("value", newd);
+                            newd = (new Date(curmax).toISOString()).substr(0,19).replace("T"," ");
+                            document.getElementsByName("wpdt")[0].setAttribute("value", newd);
+                            document.querySelector("form").submit();
+                        }
+                    }, 500);
+                }
+            }
+
+        });
+
+    </script>
 
